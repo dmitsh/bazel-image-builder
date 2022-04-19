@@ -1,0 +1,7 @@
+FROM debian:bullseye-slim
+
+RUN apt-get update && apt-get install -y curl openjdk-17-jre-headless zip patch gcc g++ python3
+
+RUN BAZEL_VER=$(basename $(curl -fs -o/dev/null -w %{redirect_url} https://github.com/bazelbuild/bazel/releases/latest)) && curl -sL https://releases.bazel.build/$BAZEL_VER/release/bazel-$BAZEL_VER-installer-linux-$(uname -m).sh -o bazel-installer.sh && chmod 755 ./bazel-installer.sh
+
+RUN ./bazel-installer.sh

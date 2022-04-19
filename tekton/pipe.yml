@@ -1,0 +1,46 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pr-build
+  namespace: ds-tkn
+spec:
+  description: >-
+    The pipeline to clone from private GitHub repo and list the directory
+  params:
+    - name: repo-url
+      description: The private GitHub Repo
+      default: https://github.tools.sap/phoenix/Phoenix
+    - name: repo-revision
+      description: The GitHub revision to use
+      default: alpha
+  workspaces:
+    - name: polygon
+  tasks:
+    - name: clone-repo
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.repo-revision)
+        - name: deleteExisting
+          value: 'true'
+      workspaces:
+        - name: output
+          workspace: polygon
+    - name: create-image
+      taskRef:
+        name: docker-build-push
+      params:
+        - name: IMAGE
+          value: bazel-infra
+        - name: DOCKERFILE
+          value: Dockerfile-bullseye-pkg
+        - name: BUILDER_IMAGE
+          value: gcr.io/sap-sc-learn/ds-test/bazel:latest
+      runAfter:
+        - clone-repo
+      workspaces:
+      - name: source
+        workspace: polygon

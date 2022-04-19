@@ -1,0 +1,23 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: pr-build-run
+  namespace: ds-tkn
+spec:
+  pipelineRef:
+    name: pr-build
+  serviceAccountName: github-bot
+  params:
+  - name: repo-url
+    value: https://github.tools.sap/phoenix/Phoenix
+  - name: repo-revision
+    value: alpha
+  workspaces:
+  - name: polygon
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Gi

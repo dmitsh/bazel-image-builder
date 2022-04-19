@@ -1,0 +1,9 @@
+FROM debian:bullseye-slim
+
+RUN apt-get update && apt-get install -y apt-transport-https curl gnupg
+
+RUN curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > /usr/share/keyrings/bazel-archive-keyring.gpg
+
+RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" > /etc/apt/sources.list.d/bazel.list
+
+RUN apt-get update && apt-get -y install patch gcc g++ python3 bazel openjdk-17-jre-headless
