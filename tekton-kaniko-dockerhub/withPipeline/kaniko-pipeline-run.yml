@@ -1,0 +1,28 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: bazel-img-build-run
+spec:
+  pipelineRef:
+    name: bazel-img-build
+  serviceAccountName: build-bot
+  params:
+  - name: repo-url
+    value: https://github.com/dmitsh/bazel-image-builder
+  - name: repo-revision
+    value: main
+  - name: dockerfile
+    value: Dockerfile-bullseye-installer
+  - name: context
+    value: .
+  - name: image-url
+    value: dmitsh/bazel-image-builder
+  workspaces:
+  - name: polygon
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi

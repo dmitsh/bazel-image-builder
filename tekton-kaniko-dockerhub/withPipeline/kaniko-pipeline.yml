@@ -1,18 +1,22 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: pr-build
-  namespace: ds-tkn
+  name: bazel-img-build
 spec:
   description: >-
-    The pipeline to clone from private GitHub repo and list the directory
+    The pipeline to clone from a GitHub repo and build Docker container image
   params:
     - name: repo-url
       description: The private GitHub Repo
       default: https://github.tools.sap/phoenix/Phoenix
     - name: repo-revision
       description: The GitHub revision to use
-      default: alpha
+      default: main
+    - name: dockerfile
+      description: Dockerfile name
+      default: Dockerfile
+    - name: image-url
+      description: docker image URL in the container registry
   workspaces:
     - name: polygon
   tasks:
@@ -31,14 +35,12 @@ spec:
           workspace: polygon
     - name: create-image
       taskRef:
-        name: docker-build-push
+        name: build-docker-image
       params:
-        - name: IMAGE
-          value: bazel-infra
-        - name: DOCKERFILE
-          value: Dockerfile-bullseye-pkg
-        - name: BUILDER_IMAGE
-          value: gcr.io/sap-sc-learn/ds-test/bazel:latest
+        - name: dockerfile
+          value: $(params.dockerfile)
+        - name: image-url
+          value: $(params.image-url)
       runAfter:
         - clone-repo
       workspaces:

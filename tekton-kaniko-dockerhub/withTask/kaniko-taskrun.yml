@@ -1,0 +1,15 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: build-docker-image-task-run
+spec:
+  serviceAccountName: build-bot
+  taskRef:
+    name: build-docker-image
+  params:
+    - name: dockerfile
+      value: Dockerfile-bullseye-installer
+    - name: context
+      value: git://github.com/dmitsh/bazel-image-builder
+    - name: image-url
+      value: dmitsh/bazel-image-builder
